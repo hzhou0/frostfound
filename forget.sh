@@ -21,16 +21,13 @@ sudo rm -rf .frostfound
 mkdir .frostfound -p
 dconf dump / > ~/.frostfound/donf-backup.txt
 #get deb packeges
-dpkg-query -f '${binary:Package}\n' -W > ~/.frostfound/packagelist.txt
-LOCAL=$(aptitude search -F "%p" '~o')
-for i in $LOCAL; do
-    sed -i "/${i}/d" ~/.frostfound/packagelist.txt
-done
+apt list --installed --manual-installed | grep -F \[installed\] | awk -F/ '{print $1}'> ~/.frostfound/packagelist.txt
 #import keys
 sudo cp -R /etc/apt/sources.list.d/ ~/.frostfound/
 sudo cp -R /etc/apt/trusted.gpg.d/ ~/.frostfound/
 sudo cp /etc/apt/sources.list ~/.frostfound/sources.txt
 sudo apt-key exportall > ~/.frostfound/Repo.keys
+DIR=$(dirname $0)
 #get flatpaks
 flatpak list --app --columns application> ~/.frostfound/flatpaklist.txt
 #get snapes
@@ -57,12 +54,18 @@ else
 		exit
 	fi
 fi
+#create remember.sh script
+cd $DIR
+cp remember.sh ~/remember.sh
+cd ~/
+git add remember.sh
 echo "commiting"
 git commit -q -am "auto update"
 echo "pushing to remote"
 echo "this might take awhile"
 git branch -M main
 git push -u origin main -f
+rm remember.sh
 exit
 
 
