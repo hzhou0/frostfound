@@ -37,8 +37,8 @@ echo "**/*Cache*">>.gitignore
 echo "**/*cache*">>.gitignore
 echo "versioning system config files"
 echo "This might take awhile (~10 minutes)"
-git add  .config .var .frostfound .local/share/gnome-shell .local/share/fonts .local/share/backgrounds \
-.local/share/applications .local/share/icons .local/share snap 
+git add  .config .var .frostfound .local/share/gnome-shell .local/share/fonts \
+.local/share/backgrounds .local/share/applications .local/share/icons .local/share/keyrings snap 
 if [[ $? -eq '0' ]]; then
 	echo "git add success"
 else 
@@ -46,8 +46,8 @@ else
 	echo "git add failed"
 	echo "This sometimes happens when config files change during add"
 	echo "Retrying once"
-	git add  .config .var .frostfound .local/share/gnome-shell .local/share/fonts .local/share/backgrounds \
-	.local/share/applications .local/share/icons .local/share snap 
+	git add  .config .var .frostfound .local/share/gnome-shell .local/share/fonts \
+	.local/share/backgrounds .local/share/applications .local/share/icons .local/share/keyrings snap 
 	if [[ $? -eq '0' ]]; then
 		echo "git add success"
 	else
