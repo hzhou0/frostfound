@@ -1,19 +1,21 @@
 #!/bin/bash
+tput clear
 URL=$1
 cd ~/
 REMOTE=$(git remote)
-echo "Purging history"
+tput smso; tput setaf 7;echo "Starting frostfound backup"
+tput setaf 4;echo "Purging history";tput sgr0
 rm -rf .git
 rm -rf .gitignore
 git init
 if [[ -n "$URL" ]]; then
 	git remote add origin $URL
-	echo "Git remote set as $URL"
+	tput smso; tput setaf 4;echo "Git remote set as $URL";tput sgr0
 elif [[ -n "$REMOTE" ]]; then
 	git remote add origin $URL
- 	echo "Using existing remote $REMOTE"
+ 	tput smso; tput setaf 4;echo "Using existing remote $REMOTE"
 else 
-	echo "Git remote not set"
+	tput smso; tput setaf 1;echo "Git remote not set"
 	echo "Exiting"
 	exit
 fi
@@ -32,26 +34,25 @@ DIR=$(dirname $0)
 flatpak list --app --columns application> ~/.frostfound/flatpaklist.txt
 #get snapes
 snap list | awk '!/disabled/{print $1}' | awk '{if(NR>1)print}'>~/.frostfound/snaplist.txt
-echo "Exclude cache files"
 echo "**/*Cache*">>.gitignore
 echo "**/*cache*">>.gitignore
-echo "versioning system config files"
-echo "This might take awhile (~10 minutes)"
+tput smso; tput setaf 4;echo "Versioning system config files(excluding cache files)"
+echo "This might take awhile (~10 minutes)";tput sgr0
 git add  .config .var .frostfound .local/share/gnome-shell .local/share/fonts \
 .local/share/backgrounds .local/share/applications .local/share/icons .local/share/keyrings snap 
 if [[ $? -eq '0' ]]; then
-	echo "git add success"
+	tput smso; tput setaf 2; echo "git add success";tput sgr0 
 else 
-	echo $?
+	tput smso; tput setaf 3; echo $?
 	echo "git add failed"
 	echo "This sometimes happens when config files change during add"
-	echo "Retrying once"
+	echo "Retrying once";tput sgr0 
 	git add  .config .var .frostfound .local/share/gnome-shell .local/share/fonts \
 	.local/share/backgrounds .local/share/applications .local/share/icons .local/share/keyrings snap 
 	if [[ $? -eq '0' ]]; then
-		echo "git add success"
+		tput smso; tput setaf 2;echo "git add success";tput sgr0 
 	else
-		echo "Retry unsuccessful"
+		tput smso; tput setaf 1;echo "Retry unsuccessful"
 		echo "Exiting"
 		exit
 	fi
@@ -61,10 +62,9 @@ cd $DIR
 cp remember.sh ~/remember.sh
 cd ~/
 git add remember.sh
-echo "commiting"
+tput smso; tput setaf 4;echo "commiting";tput sgr0 
 git commit -q -am "auto update"
-echo "pushing to remote"
-echo "this might take awhile"
+tput smso; tput setaf 4;echo "Pushing to remote(this might take awhile)";tput sgr0 
 git branch -M main
 git push -u origin main -f
 rm remember.sh
