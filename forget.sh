@@ -1,6 +1,5 @@
 #!/bin/bash
 tput clear
-URL=$1
 cd ~/ || exit
 REMOTE=$(git remote get-url origin)
 tput smso; tput setaf 7;echo "Starting frostfound backup"
@@ -8,16 +7,17 @@ tput setaf 4;echo "Purging history";tput sgr0
 rm -rf .git
 rm -rf .gitignore
 git init
-if [[ -n "$URL" ]]; then
-	git remote add origin "$URL"
-	tput smso; tput setaf 4;echo "Git remote set as $URL";tput sgr0
+if [[ -n "$1" ]]; then
+	git remote add origin "$1"
+	tput smso; tput setaf 4;echo "Git remote set as $1";tput sgr0
 elif [[ -n "$REMOTE" ]]; then
 	git remote add origin "$REMOTE"
  	tput smso; tput setaf 4;echo "Using existing remote $REMOTE";tput sgr0
 else 
 	tput smso; tput setaf 1;echo "Git remote not set"
-	echo "Exiting"
-	exit
+	read -rp "Git remote(url): " REMOTE
+	git remote add origin "$REMOTE"
+	tput smso; tput setaf 4;echo "Git remote set as $REMOTE";tput sgr0
 fi
 sudo rm -rf .frostfound
 mkdir .frostfound -p
@@ -68,17 +68,17 @@ while IFS= read -r line; do
     A+="- $line\n"
 done < /etc/os-release
 sed -i "s|(SYSTEM INFO)|${A}|" ~/README.md
-
 cd ~/ || exit
 git add ~/remember.sh
 git add ~/README.md
 tput smso; tput setaf 4;echo "committing";tput sgr0
-git commit -q -am "auto update"
+git commit -qam "auto update"
 tput smso; tput setaf 4;echo "Syncing with remote (this might take awhile)";tput sgr0
 git fetch origin
-git merge -s ours origin/main  --allow-unrelated-histories -m "auto update"
-git branch -M main
-git push -u origin main -f
+BRANCH=$(basename "$(git branch -r)")
+git merge -s ours "origin/${BRANCH}" --allow-unrelated-histories -m "Ignore this; Mock merge"
+git branch -M "$BRANCH"
+git push -u origin "$BRANCH" -f
 rm ~/remember.sh
 rm ~/README.md
 exit

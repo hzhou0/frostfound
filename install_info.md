@@ -6,7 +6,7 @@
 - Make `remember.sh` executable
 - Run `remember.sh` 
 - Your system will reboot on completion
-##Potential Issues
+## Potential Issues
 ### "Apt install failed"
 - This can sometimes happen to one or two packages
 - Resulting from a package on your system no longer installable through APT
