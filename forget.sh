@@ -19,7 +19,6 @@ else
 	echo "Exiting"
 	exit
 fi
-git fetch origin main
 sudo rm -rf .frostfound
 mkdir .frostfound -p
 dconf dump / > ~/.frostfound/donf-backup.txt
@@ -62,15 +61,26 @@ fi
 #create remember.sh script
 cd "$DIR" || exit
 cp remember.sh ~/remember.sh
+cp install_info.md ~/README.md
+sed -i "s/(DATE)/$(date)/" ~/README.md
+A=""
+while IFS= read -r line; do
+    A+="- $line\n"
+done < /etc/os-release
+sed -i "s|(SYSTEM INFO)|${A}|" ~/README.md
+
 cd ~/ || exit
-git add remember.sh
-exit
+git add ~/remember.sh
+git add ~/README.md
 tput smso; tput setaf 4;echo "committing";tput sgr0
 git commit -q -am "auto update"
-tput smso; tput setaf 4;echo "Pushing to remote (this might take awhile)";tput sgr0
+tput smso; tput setaf 4;echo "Syncing with remote (this might take awhile)";tput sgr0
+git fetch origin
+git merge -s ours origin/main  --allow-unrelated-histories -m "auto update"
 git branch -M main
-git push origin main
-#rm remember.sh
+git push -u origin main -f
+rm ~/remember.sh
+rm ~/README.md
 exit
 
 

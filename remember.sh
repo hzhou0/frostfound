@@ -1,5 +1,5 @@
-cd $(dirname $0)
-cd .frostfound
+cd "$(dirname "$0")" || exit
+cd .frostfound || exit
 #import keys
 sudo apt-key add Repo.keys
 sudo cp -R trusted.gpg.d /etc/apt/trusted.gpg.d/ 
@@ -9,22 +9,21 @@ sudo apt update
 # sudo rm -r trusted.gpg.d sources.list.d
 
 #install packages
-sudo xargs -a packagelist.txt apt-get install --ignore-missing -y -q
-if [[ $? -ne '0' ]]; then
+if sudo xargs -a packagelist.txt apt-get install --ignore-missing -y -q; then
     echo "Apt installed failed"
     exit
 fi
 #install flatpaks
-cat flatpaklist.txt | while read line; do
-    flatpak install flathub $line -y --noninteractive
-done
+while IFS= read -r line; do
+    flatpak install flathub "$line" -y --noninteractive
+done < flatpaklist.txt
 #install snaps
-cat snaplist.txt | while read line; do
-    sudo snap install $line --classic
-done
+while IFS= read -r line; do
+    sudo snap install "$line" --classic
+done < snaplist.txt
 #replace configs
 cd ..
-FOLDERS=$(find $PWD -maxdepth 1 -type d)
+FOLDERS=$(find "$PWD" -maxdepth 1 -type d)
 for i in $FOLDERS; do
     HOME=~
     #TARGET="${HOME}/${i}"
@@ -33,6 +32,6 @@ for i in $FOLDERS; do
     BASE=${i##*/}
     rsync --recursive "${i}/" "${HOME}/${BASE}/"
 done
-cd .frostfound
+cd .frostfound || exit
 dconf load / < donf-backup.txt
 sudo reboot
